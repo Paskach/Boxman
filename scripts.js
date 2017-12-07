@@ -5,17 +5,32 @@ function startGame() {
   running = true;
   drawBorders();
   var frame = function() { //Code to execute every frame
-    box.vel++;
-    box.y += box.vel
+    drawBoxman((boxman.x + 1) * 16, boxman.sprite);
+    box.vel += .25;
+    box.y += Math.floor(box.vel);
     checkBoxCollide();
     drawFallingBox();
   }
   var x = setInterval(frame, 16);
+  document.onkeypress = function(evt) {
+    evt = evt || window.event;
+    var charCode = evt.keyCode || evt.which;
+    var charStr = String.fromCharCode(charCode);
+    document.getElementById("debug").innerHTML += charStr;
+
+    if (charStr == "d") {
+      moveRight();
+    } //Key presses
+    if (charStr == "a") {
+      moveLeft();
+    }
+  };
 }
 
-function drawSprite(x, y, img) {
-  document.getElementById("game").getContext("2d").drawImage(img, x, y);
-}
+var boxman = {
+  x: 0,
+  sprite: "1"
+};
 
 var box = {
   x: 0,
@@ -56,6 +71,26 @@ function checkBoxCollide() {
     field.heights[box.x]++;
     box.x = Math.floor(Math.random() * 12);
   }
+}
+
+function drawSprite(x, y, img) {
+  document.getElementById("game").getContext("2d").drawImage(img, x, y);
+}
+
+function drawBoxman(x, sprite) {
+  if (sprite == 1) {
+    drawSprite(x, document.getElementById("game").height - (field.heights[boxman.x] * 16) - 32, sprites.guy1);
+  }
+}
+
+function moveRight() {
+  drawSprite((boxman.x + 1) * 16, document.getElementById("game").height - (field.heights[boxman.x] * 16) - 32, sprites.eraser);
+  boxman.x++;
+}
+
+function moveLeft() {
+  drawSprite((boxman.x + 1) * 16, document.getElementById("game").height - (field.heights[boxman.x] * 16) - 32, sprites.eraser);
+  boxman.x--;
 }
 
 class Sprites {
