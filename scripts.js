@@ -5,7 +5,11 @@ function startGame() {
   running = true;
   drawBorders();
   var frame = function() { //Code to execute every frame
-    drawBoxman((boxman.x + 1) * 16, boxman.sprite);
+    if (!boxman.jumping) {
+      drawBoxman((boxman.x + 1) * 16, boxman.sprite);
+    } else {
+      moveBoxman();
+    }
     box.vel += .25;
     box.y += Math.floor(box.vel);
     checkBoxCollide();
@@ -18,10 +22,10 @@ function startGame() {
     var charStr = String.fromCharCode(charCode);
     document.getElementById("debug").innerHTML += charStr;
 
-    if (charStr == "d") {
+    if (charStr == "d" && !boxman.jumping) {
       moveRight();
     } //Key presses
-    if (charStr == "a") {
+    if (charStr == "a" && !boxman.jumping) {
       moveLeft();
     }
   };
@@ -29,7 +33,12 @@ function startGame() {
 
 var boxman = {
   x: 0,
-  sprite: "1"
+  screeny: 0,
+  screenx: 0,
+  sprite: "1",
+  jumping: false,
+  moving: "",
+  frame: 0
 };
 
 var box = {
@@ -81,16 +90,164 @@ function drawBoxman(x, sprite) {
   if (sprite == 1) {
     drawSprite(x, document.getElementById("game").height - (field.heights[boxman.x] * 16) - 32, sprites.guy1);
   }
+  if (sprite == 2) {
+    drawSprite(x, document.getElementById("game").height - (field.heights[boxman.x] * 16) - 32, sprites.guy2);
+  }
+  if (sprite == 3) {
+    drawSprite(x, document.getElementById("game").height - (field.heights[boxman.x] * 16) - 32, sprites.guy3);
+  }
 }
 
 function moveRight() {
-  drawSprite((boxman.x + 1) * 16, document.getElementById("game").height - (field.heights[boxman.x] * 16) - 32, sprites.eraser);
-  boxman.x++;
+  if (field.heights[boxman.x + 1] - field.heights[boxman.x] <= 1 && box.x - 1 != boxman.x) {
+    boxman.screenx = (boxman.x + 1) * 16;
+    boxman.screeny = document.getElementById("game").height - (field.heights[boxman.x] * 16) - 32;
+    boxman.moving = "right";
+    boxman.jumping = true;
+    boxman.frame = 0;
+  }
 }
 
 function moveLeft() {
-  drawSprite((boxman.x + 1) * 16, document.getElementById("game").height - (field.heights[boxman.x] * 16) - 32, sprites.eraser);
-  boxman.x--;
+  if (field.heights[boxman.x - 1] - field.heights[boxman.x] <= 1 && box.x + 1 != boxman.x) {
+    boxman.screenx = (boxman.x + 1) * 16;
+    boxman.screeny = document.getElementById("game").height - (field.heights[boxman.x] * 16) - 32;
+    boxman.moving = "left";
+    boxman.jumping = true;
+    boxman.frame = 0;
+  }
+}
+
+function moveBoxman() {
+  if (boxman.moving == "right") {
+    boxman.frame++;
+    drawSprite(boxman.screenx, Math.floor(boxman.screeny / 16) * 16, sprites.eraser);
+    if (boxman.frame == 1) {
+      drawSprite(boxman.screenx, boxman.screeny, sprites.guy2);
+    }
+    if (boxman.frame == 2) {
+      drawSprite(boxman.screenx, boxman.screeny, sprites.guy3);
+    }
+    if (boxman.frame == 3) {
+      drawSprite(boxman.screenx, boxman.screeny, sprites.guy2);
+    }
+    if (boxman.frame == 4) {
+      drawSprite(boxman.screenx, boxman.screeny, sprites.guy1);
+      if (field.heights[boxman.x + 1] - field.heights[boxman.x] == 1) {
+        boxman.frame = 50;
+      }
+    }
+    if (boxman.frame > 4 && boxman.frame <= 12) {
+      boxman.screenx += 2;
+      drawSprite(boxman.screenx, boxman.screeny - 2, sprites.guy1);
+    }
+    if (boxman.frame == 12) {
+      if (field.heights[boxman.x + 1] - field.heights[boxman.x] < 0) {
+        boxman.frame = 100;
+        //alert('fall');
+      }
+    }
+    if (boxman.frame == 13) {
+      drawSprite(boxman.screenx, boxman.screeny, sprites.guy2);
+    }
+    if (boxman.frame == 14) {
+      drawSprite(boxman.screenx, boxman.screeny, sprites.guy3);
+    }
+    if (boxman.frame == 15) {
+      drawSprite(boxman.screenx, boxman.screeny, sprites.guy2);
+    }
+    if (boxman.frame == 16) {
+      drawSprite(boxman.screenx, boxman.screeny, sprites.guy1);
+      boxman.moving = "";
+      boxman.frame = 0;
+      boxman.jumping = false;
+      boxman.x++;
+    }
+    if (boxman.frame >= 50 && boxman.frame < 99) {
+      boxman.screeny -= 4;
+      drawSprite(boxman.screenx, boxman.screeny + 4, sprites.eraser);
+      drawSprite(boxman.screenx, boxman.screeny, sprites.guy1);
+    }
+    if (boxman.frame == 53) {
+      boxman.screenx += 2;
+      drawSprite(boxman.screenx, boxman.screeny, sprites.guy1);
+      boxman.frame = 5;
+    }
+    if (boxman.frame >= 100) {
+      document.getElementById("debug").innerHTML += boxman.screeny;
+      boxman.screeny += 4;
+      drawSprite(boxman.screenx, boxman.screeny - 4, sprites.eraser);
+      drawSprite(boxman.screenx, boxman.screeny, sprites.guy1);
+    }
+    if (boxman.frame == (99 + Math.abs(field.heights[boxman.x + 1] - field.heights[boxman.x]) * 4)) {
+      boxman.frame = 13;
+      drawSprite(boxman.screenx, boxman.screeny, sprites.guy1);
+    }
+  }
+  if (boxman.moving == "left") {
+    boxman.frame++;
+    drawSprite(boxman.screenx, Math.floor(boxman.screeny / 16) * 16, sprites.eraser);
+    if (boxman.frame == 1) {
+      drawSprite(boxman.screenx, boxman.screeny, sprites.guy2);
+    }
+    if (boxman.frame == 2) {
+      drawSprite(boxman.screenx, boxman.screeny, sprites.guy3);
+    }
+    if (boxman.frame == 3) {
+      drawSprite(boxman.screenx, boxman.screeny, sprites.guy2);
+    }
+    if (boxman.frame == 4) {
+      drawSprite(boxman.screenx, boxman.screeny, sprites.guy1);
+      if (field.heights[boxman.x - 1] - field.heights[boxman.x] == 1) {
+        boxman.frame = 50;
+      }
+    }
+    if (boxman.frame > 4 && boxman.frame <= 12) {
+      boxman.screenx -= 2;
+      drawSprite(boxman.screenx, boxman.screeny - 2, sprites.guy1);
+    }
+    if (boxman.frame == 12) {
+      if (field.heights[boxman.x - 1] - field.heights[boxman.x] < 0) {
+        boxman.frame = 100;
+      }
+    }
+    if (boxman.frame == 13) {
+      drawSprite(boxman.screenx, boxman.screeny, sprites.guy2);
+    }
+    if (boxman.frame == 14) {
+      drawSprite(boxman.screenx, boxman.screeny, sprites.guy3);
+    }
+    if (boxman.frame == 15) {
+      drawSprite(boxman.screenx, boxman.screeny, sprites.guy2);
+    }
+    if (boxman.frame == 16) {
+      drawSprite(boxman.screenx, boxman.screeny, sprites.guy1);
+      boxman.moving = "";
+      boxman.frame = 0;
+      boxman.jumping = false;
+      boxman.x--;
+    }
+    if (boxman.frame >= 50 && boxman.frame < 99) {
+      boxman.screeny -= 4;
+      drawSprite(boxman.screenx, boxman.screeny + 4, sprites.eraser);
+      drawSprite(boxman.screenx, boxman.screeny, sprites.guy1);
+    }
+    if (boxman.frame == 53) {
+      boxman.screenx -= 2;
+      drawSprite(boxman.screenx, boxman.screeny, sprites.guy1);
+      boxman.frame = 5;
+    }
+    if (boxman.frame >= 100) {
+      document.getElementById("debug").innerHTML += boxman.screeny;
+      boxman.screeny += 4;
+      drawSprite(boxman.screenx, boxman.screeny - 4, sprites.eraser);
+      drawSprite(boxman.screenx, boxman.screeny, sprites.guy1);
+    }
+    if (boxman.frame == (99 + Math.abs(field.heights[boxman.x - 1] - field.heights[boxman.x]) * 4)) {
+      boxman.frame = 13;
+      drawSprite(boxman.screenx, boxman.screeny, sprites.guy1);
+    }
+  }
 }
 
 class Sprites {
@@ -100,6 +257,12 @@ class Sprites {
   }
   get guy1() {
     return document.getElementById("guy1");
+  }
+  get guy2() {
+    return document.getElementById("guy2");
+  }
+  get guy3() {
+    return document.getElementById("guy3");
   }
   get eraser() {
     return document.getElementById("eraser");
