@@ -2,29 +2,49 @@ function startGame() {
   if (running) {
     return;
   }
+  box.x = Math.floor(Math.random() * 12);
   running = true;
   drawBorders();
   var frame = function() { //Code to execute every frame
-    if (!boxman.jumping) {
-      drawBoxman((boxman.x + 1) * 16, boxman.sprite);
-    } else {
-      moveBoxman();
-    }
-    box.vel += .25;
-    box.y += Math.floor(box.vel);
-    checkBoxCollide();
-    drawFallingBox();
-  }
+      if ((box.x + 1) * 16 == boxman.screenx) {
+        boxman.sprite = 4;
+      } else {
+        boxman.sprite = 1;
+      }
+      if (!boxman.jumping) {
+        drawBoxman((boxman.x + 1) * 16, boxman.sprite);
+      } else {
+        moveBoxman();
+      }
+      box.vel += .25;
+      box.y += Math.floor(box.vel);
+      checkBoxCollide();
+      drawFallingBox();
+      redrawTops();
+      if (score > highscore) {
+        highscore = score;
+      }
+      textPrint((document.getElementById("game").width / 2) - 40, 0, sprites.font1, "high score");
+      textPrint(16, 0, sprites.font1, "1up");
+      textPrint(40 - (8 * score.toString().length), 8, sprites.font, score + "0");
+      textPrint(((document.getElementById("game").width / 2) - 24) - (8 * (highscore.toString().length - 5)), 8, sprites.font, highscore + "0");
+      textPrint((document.getElementById("game").width / 2) - 40, 160, sprites.font1, gameOverString);
+      if (!running) {
+        clearInterval(x);
+        die();
+      }
+    } // end frame code
   var x = setInterval(frame, 16);
+
   document.onkeypress = function(evt) {
     evt = evt || window.event;
     var charCode = evt.keyCode || evt.which;
     var charStr = String.fromCharCode(charCode);
     document.getElementById("debug").innerHTML += charStr;
 
-    if (charStr == "d" && !boxman.jumping) {
+    if (charStr == "d" && !boxman.jumping) { //Key presses
       moveRight();
-    } //Key presses
+    }
     if (charStr == "a" && !boxman.jumping) {
       moveLeft();
     }
@@ -38,7 +58,8 @@ var boxman = {
   sprite: "1",
   jumping: false,
   moving: "",
-  frame: 0
+  frame: 0,
+  columnDif: 0
 };
 
 var box = {
@@ -72,6 +93,8 @@ function drawFallingBox() {
 function checkBoxCollide() {
   if (box.y > document.getElementById("game").height - (field.heights[box.x] * 16) - 32) {
     box.y = document.getElementById("game").height - (field.heights[box.x] * 16) - 32;
+    checkIfDead();
+    score += field.heights[boxman.x];
     drawSprite((box.x + 1) * 16, box.y - box.vel, sprites.eraser);
     drawSprite((box.x + 1) * 16, box.y - 16, sprites.eraser);
     box.vel = 0;
@@ -96,6 +119,9 @@ function drawBoxman(x, sprite) {
   if (sprite == 3) {
     drawSprite(x, document.getElementById("game").height - (field.heights[boxman.x] * 16) - 32, sprites.guy3);
   }
+  if (sprite == 4) {
+    drawSprite(x, document.getElementById("game").height - (field.heights[boxman.x] * 16) - 32, sprites.guy4);
+  }
 }
 
 function moveRight() {
@@ -105,6 +131,8 @@ function moveRight() {
     boxman.moving = "right";
     boxman.jumping = true;
     boxman.frame = 0;
+    boxman.columnDiff = field.heights[boxman.x + 1] - field.heights[boxman.x];
+    boxman.sprite = 1;
   }
 }
 
@@ -115,6 +143,8 @@ function moveLeft() {
     boxman.moving = "left";
     boxman.jumping = true;
     boxman.frame = 0;
+    boxman.columnDiff = field.heights[boxman.x - 1] - field.heights[boxman.x];
+    boxman.sprite = 1;
   }
 }
 
@@ -133,7 +163,7 @@ function moveBoxman() {
     }
     if (boxman.frame == 4) {
       drawSprite(boxman.screenx, boxman.screeny, sprites.guy1);
-      if (field.heights[boxman.x + 1] - field.heights[boxman.x] == 1) {
+      if (boxman.columnDiff == 1) {
         boxman.frame = 50;
       }
     }
@@ -142,7 +172,7 @@ function moveBoxman() {
       drawSprite(boxman.screenx, boxman.screeny - 2, sprites.guy1);
     }
     if (boxman.frame == 12) {
-      if (field.heights[boxman.x + 1] - field.heights[boxman.x] < 0) {
+      if (boxman.columnDiff < 0) {
         boxman.frame = 100;
         //alert('fall');
       }
@@ -179,7 +209,7 @@ function moveBoxman() {
       drawSprite(boxman.screenx, boxman.screeny - 4, sprites.eraser);
       drawSprite(boxman.screenx, boxman.screeny, sprites.guy1);
     }
-    if (boxman.frame == (99 + Math.abs(field.heights[boxman.x + 1] - field.heights[boxman.x]) * 4)) {
+    if (boxman.frame == (99 + Math.abs(boxman.columnDiff) * 4)) {
       boxman.frame = 13;
       drawSprite(boxman.screenx, boxman.screeny, sprites.guy1);
     }
@@ -198,7 +228,7 @@ function moveBoxman() {
     }
     if (boxman.frame == 4) {
       drawSprite(boxman.screenx, boxman.screeny, sprites.guy1);
-      if (field.heights[boxman.x - 1] - field.heights[boxman.x] == 1) {
+      if (boxman.columnDiff == 1) {
         boxman.frame = 50;
       }
     }
@@ -207,7 +237,7 @@ function moveBoxman() {
       drawSprite(boxman.screenx, boxman.screeny - 2, sprites.guy1);
     }
     if (boxman.frame == 12) {
-      if (field.heights[boxman.x - 1] - field.heights[boxman.x] < 0) {
+      if (boxman.columnDiff < 0) {
         boxman.frame = 100;
       }
     }
@@ -243,11 +273,40 @@ function moveBoxman() {
       drawSprite(boxman.screenx, boxman.screeny - 4, sprites.eraser);
       drawSprite(boxman.screenx, boxman.screeny, sprites.guy1);
     }
-    if (boxman.frame == (99 + Math.abs(field.heights[boxman.x - 1] - field.heights[boxman.x]) * 4)) {
+    if (boxman.frame == (99 + Math.abs(boxman.columnDiff) * 4)) {
       boxman.frame = 13;
       drawSprite(boxman.screenx, boxman.screeny, sprites.guy1);
     }
   }
+}
+
+function redrawTops() { //change this to detect what block it needs to draw
+  field.heights.forEach(function(height, index) {
+    drawSprite((index + 1) * 16, document.getElementById("game").height - (height * 16 + 16), sprites.box);
+  });
+}
+
+function checkIfDead() {
+  if (box.y == document.getElementById("game").height - (field.heights[boxman.x] * 16) - 32 && boxman.sprite == 4) {
+    drawSprite((boxman.x + 1) * 16, document.getElementById("game").height - (field.heights[boxman.x] * 16) - 16, sprites.blood);
+    drawSprite((boxman.x + 1) * 16, document.getElementById("game").height - (field.heights[boxman.x] * 16) - 32, sprites.box);
+    running = false;
+    gameOverString = "game over";
+  }
+}
+
+function textPrint(x, y, sprite, string) {
+  for (var i = 0; i < string.length; i++) {
+    if (alphabet.indexOf(string.charAt(i)) >= 0) {
+      document.getElementById("game").getContext("2d").drawImage(sprite, 12 * alphabet.indexOf(string.charAt(i)), 0, 8, 8, x + (8 * i), y, 8, 8);
+    }
+  }
+}
+
+function die() {
+  setTimeout(function() {
+    init();
+  }, 2500);
 }
 
 class Sprites {
@@ -264,10 +323,56 @@ class Sprites {
   get guy3() {
     return document.getElementById("guy3");
   }
+  get guy4() {
+    return document.getElementById("guy4");
+  }
+  get blood() {
+    return document.getElementById("blood");
+  }
   get eraser() {
     return document.getElementById("eraser");
   }
+  get font() {
+    return document.getElementById("font");
+  }
+  get font1() {
+    return document.getElementById("font1");
+  }
+}
+
+function init() {
+  running = false;
+  score = 0;
+  boxman = {
+    x: 0,
+    screeny: 0,
+    screenx: 0,
+    sprite: "1",
+    jumping: false,
+    moving: "",
+    frame: 0,
+    columnDif: 0
+  };
+
+  box = {
+    x: 0,
+    y: 0,
+    vel: 0,
+    type: "normal"
+  };
+
+  field = {
+    heights: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    bomb: false
+  };
+  gameOverString = "";
+  document.getElementById("game").getContext("2d").drawImage(sprites.eraser, 0, 0, document.getElementById("game").width, document.getElementById("game").height);
+  startGame();  //change this to title screen
 }
 
 const sprites = new Sprites();
 var running = false;
+var score = 0;
+var highscore = 2000
+var gameOverString = "";
+var alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
