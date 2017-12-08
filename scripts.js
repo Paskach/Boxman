@@ -6,32 +6,38 @@ function startGame() {
   running = true;
   drawBorders();
   var frame = function() { //Code to execute every frame
-      if ((box.x + 1) * 16 == boxman.screenx) {
-        boxman.sprite = 4;
-      } else {
-        boxman.sprite = 1;
+      if (field.heights[boxman.x] > 4 && field.scrolling == 0 & !boxman.jumping) {
+        field.scrolling = 1;
       }
-      if (!boxman.jumping) {
-        drawBoxman((boxman.x + 1) * 16, boxman.sprite);
-      } else {
-        moveBoxman();
-      }
-      box.vel += .25;
-      box.y += Math.floor(box.vel);
-      checkBoxCollide();
-      drawFallingBox();
-      redrawTops();
-      if (score > highscore) {
-        highscore = score;
-      }
-      textPrint((document.getElementById("game").width / 2) - 40, 0, sprites.font1, "high score");
-      textPrint(16, 0, sprites.font1, "1up");
-      textPrint(40 - (8 * score.toString().length), 8, sprites.font, score + "0");
-      textPrint(((document.getElementById("game").width / 2) - 24) - (8 * (highscore.toString().length - 5)), 8, sprites.font, highscore + "0");
-      textPrint((document.getElementById("game").width / 2) - 40, 160, sprites.font1, gameOverString);
-      if (!running) {
-        clearInterval(x);
-        die();
+      scroll();
+      if (field.scrolling == 0) {
+        if ((box.x + 1) * 16 == boxman.screenx) {
+          boxman.sprite = 4;
+        } else {
+          boxman.sprite = 1;
+        }
+        if (!boxman.jumping) {
+          drawBoxman((boxman.x + 1) * 16, boxman.sprite);
+        } else {
+          moveBoxman();
+        }
+        box.vel += .25;
+        box.y += Math.floor(box.vel);
+        checkBoxCollide();
+        drawFallingBox();
+        redrawTops();
+        if (score > highscore) {
+          highscore = score;
+        }
+        textPrint((document.getElementById("game").width / 2) - 40, 0, sprites.font1, "high score");
+        textPrint(16, 0, sprites.font1, "1up");
+        textPrint(40 - (8 * score.toString().length), 8, sprites.font, score + "0");
+        textPrint(((document.getElementById("game").width / 2) - 24) - (8 * (highscore.toString().length - 5)), 8, sprites.font, highscore + "0");
+        textPrint((document.getElementById("game").width / 2) - 40, 160, sprites.font1, gameOverString);
+        if (!running) {
+          clearInterval(x);
+          die();
+        }
       }
     } // end frame code
   var x = setInterval(frame, 16);
@@ -41,12 +47,13 @@ function startGame() {
     var charCode = evt.keyCode || evt.which;
     var charStr = String.fromCharCode(charCode);
     document.getElementById("debug").innerHTML += charStr;
-
-    if (charStr == "d" && !boxman.jumping) { //Key presses
-      moveRight();
-    }
-    if (charStr == "a" && !boxman.jumping) {
-      moveLeft();
+    if (field.scrolling == 0) {
+      if (charStr == "d" && !boxman.jumping) { //Key presses
+        moveRight();
+      }
+      if (charStr == "a" && !boxman.jumping) {
+        moveLeft();
+      }
     }
   };
 }
@@ -64,14 +71,16 @@ var boxman = {
 
 var box = {
   x: 0,
-  y: 0,
+  y: 32,
   vel: 0,
   type: "normal"
 };
 
 var field = {
   heights: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  bomb: false
+  bomb: false,
+  scrolling: 0,
+  bonus: 0
 };
 
 function drawBorders() {
@@ -94,12 +103,12 @@ function checkBoxCollide() {
   if (box.y > document.getElementById("game").height - (field.heights[box.x] * 16) - 32) {
     box.y = document.getElementById("game").height - (field.heights[box.x] * 16) - 32;
     checkIfDead();
-    score += field.heights[boxman.x];
+    score += field.heights[boxman.x] + field.bonus;
     drawSprite((box.x + 1) * 16, box.y - box.vel, sprites.eraser);
     drawSprite((box.x + 1) * 16, box.y - 16, sprites.eraser);
     box.vel = 0;
     drawSprite((box.x + 1) * 16, box.y, sprites.box)
-    box.y = 16;
+    box.y = 32;
     field.heights[box.x]++;
     box.x = Math.floor(Math.random() * 12);
   }
@@ -309,6 +318,29 @@ function die() {
   }, 2500);
 }
 
+function scroll() {
+  if (field.scrolling > 0) {
+    for (var j = 0; j < 12; j++) {
+      for (var k = 0; k < field.heights[j]; k++) {
+        drawSprite((j + 1) * 16, document.getElementById("game").height - (((k + 2) * 16) - (field.scrolling - 16)), sprites.eraser);
+        drawSprite((j + 1) * 16, document.getElementById("game").height - (((k + 2) * 16) - field.scrolling), sprites.box);
+      }
+    }
+    drawSprite((boxman.x + 1) * 16, document.getElementById("game").height - ((field.heights[boxman.x] + 2) * 16) + field.scrolling, sprites.guy1);
+    document.getElementById("debug").innerHTML += "scroll DX"
+    field.scrolling++;
+  }
+  if (field.scrolling > 16) {
+    field.scrolling = 0;
+    field.bonus++;
+    for (var i = 0; i < 12; i++) {
+      if (field.heights[i] > 0) {
+        field.heights[i]--;
+      }
+    }
+  }
+}
+
 class Sprites {
   constructor() {}
   get box() {
@@ -363,11 +395,13 @@ function init() {
 
   field = {
     heights: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    bomb: false
+    bomb: false,
+    scrolling: 0,
+    bonus: 0
   };
   gameOverString = "";
   document.getElementById("game").getContext("2d").drawImage(sprites.eraser, 0, 0, document.getElementById("game").width, document.getElementById("game").height);
-  startGame();  //change this to title screen
+  startGame(); //change this to title screen
 }
 
 const sprites = new Sprites();
@@ -375,4 +409,5 @@ var running = false;
 var score = 0;
 var highscore = 2000
 var gameOverString = "";
+var imgData = 0;
 var alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
