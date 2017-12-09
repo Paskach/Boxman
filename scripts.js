@@ -66,6 +66,10 @@ function startGame() {
             //setDown();
           }
         }
+        if(queue.charAt(0) == "s" && field.heights[boxman.x] == 0 && !boxman.jumping)
+        {
+        queue = queue.slice(2);
+        }
       }
       document.getElementById("debug").innerHTML = queue;
     } // end frame code
@@ -75,7 +79,7 @@ function startGame() {
     evt = evt || window.event;
     var charCode = evt.keyCode || evt.which;
     var charStr = String.fromCharCode(charCode);
-    if (document.getElementById("debug").innerHTML.length < 2) {
+    if (document.getElementById("debug").innerHTML.length < 3) {
       document.getElementById("debug").innerHTML += charStr;
     }
     queue = document.getElementById("debug").innerHTML
