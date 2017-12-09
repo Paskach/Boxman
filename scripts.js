@@ -41,12 +41,33 @@ function startGame() {
         }
         pickup();
         setDown();
-        if(boxman.carrying == -2)
-        {
-        drawSprite(boxman.screenx, boxman.screeny-16, sprites.box);
-    	drawSprite(boxman.screenx, boxman.screeny-32, sprites.eraser);
+
+        if (boxman.carrying == -2) {
+          drawSprite(boxman.screenx, boxman.screeny - 16, sprites.box);
+          drawSprite(boxman.screenx, boxman.screeny - 32, sprites.eraser);
+        }
+        if (queue.charAt(0) == "d" && !boxman.jumping && boxman.carrying < 0) { //Key presses
+          moveRight();
+          queue = queue.slice(2);
+        }
+        if (queue.charAt(0) == "a" && !boxman.jumping && boxman.carrying < 0) {
+          moveLeft();
+          queue = queue.slice(2);
+        }
+        if (queue.charAt(0) == "s" && !boxman.jumping && boxman.carrying < 0) {
+          if (boxman.carrying == -1 && field.heights[boxman.x] > 0) {
+            boxman.carrying = 0;
+            queue = queue.slice(2);
+            //pickup();
+          }
+          if (boxman.carrying == -2) {
+            boxman.carrying = 17;
+            queue = queue.slice(2);
+            //setDown();
+          }
         }
       }
+      document.getElementById("debug").innerHTML = queue;
     } // end frame code
   var x = setInterval(frame, 16);
 
@@ -54,25 +75,10 @@ function startGame() {
     evt = evt || window.event;
     var charCode = evt.keyCode || evt.which;
     var charStr = String.fromCharCode(charCode);
-    document.getElementById("debug").innerHTML += charStr;
-    if (field.scrolling == 0) {
-      if (charStr == "d" && !boxman.jumping && boxman.carrying <0) { //Key presses
-        moveRight();
-      }
-      if (charStr == "a" && !boxman.jumping && boxman.carrying <0) {
-        moveLeft();
-      }
-      if (charStr == "s" && !boxman.jumping && boxman.carrying < 0) {
-        if (boxman.carrying == -1 && field.heights[boxman.x] > 0) {
-          boxman.carrying = 0;
-          //pickup();
-        }
-        if (boxman.carrying == -2) {
-          boxman.carrying = 17;
-          //setDown();
-        }
-      }
+    if (document.getElementById("debug").innerHTML.length < 2) {
+      document.getElementById("debug").innerHTML += charStr;
     }
+    queue = document.getElementById("debug").innerHTML
   };
 }
 
@@ -130,6 +136,9 @@ function checkBoxCollide() {
     box.y = 32;
     field.heights[box.x]++;
     box.x = Math.floor(Math.random() * 12);
+    while (field.heights[box.x] > 9) {
+      box.x = Math.floor(Math.random() * 12);
+    }
   }
 }
 
@@ -234,7 +243,7 @@ function moveBoxman() {
       boxman.frame = 5;
     }
     if (boxman.frame >= 100) {
-      document.getElementById("debug").innerHTML += boxman.screeny;
+      //document.getElementById("debug").innerHTML += boxman.screeny;
       boxman.screeny += 4;
       drawSprite(boxman.screenx, boxman.screeny - 4, sprites.eraser);
       drawSprite(boxman.screenx, boxman.screeny, sprites.guy1);
@@ -300,7 +309,7 @@ function moveBoxman() {
       boxman.frame = 5;
     }
     if (boxman.frame >= 100) {
-      document.getElementById("debug").innerHTML += boxman.screeny;
+      //document.getElementById("debug").innerHTML += boxman.screeny;
       boxman.screeny += 4;
       drawSprite(boxman.screenx, boxman.screeny - 4, sprites.eraser);
       drawSprite(boxman.screenx, boxman.screeny, sprites.guy1);
@@ -351,9 +360,10 @@ function scroll() {
     }
     drawSprite((boxman.x + 1) * 16, document.getElementById("game").height - ((field.heights[boxman.x] + 2) * 16) + field.scrolling, sprites.guy1);
     drawSprite((boxman.x + 1) * 16, document.getElementById("game").height - ((field.heights[boxman.x] + 4) * 16) + field.scrolling, sprites.eraser);
-    if(boxman.carrying == -2){
-    drawSprite((boxman.x + 1) * 16, document.getElementById("game").height - ((field.heights[boxman.x] + 3) * 16) + field.scrolling, sprites.box);}
-    document.getElementById("debug").innerHTML += "scroll DX"
+    if (boxman.carrying == -2) {
+      drawSprite((boxman.x + 1) * 16, document.getElementById("game").height - ((field.heights[boxman.x] + 3) * 16) + field.scrolling, sprites.box);
+    }
+    //document.getElementById("debug").innerHTML += "scroll DX"
     field.scrolling++;
   }
   if (field.scrolling > 16) {
@@ -374,9 +384,9 @@ function pickup() {
     drawSprite((boxman.x + 1) * 16, document.getElementById("game").height - ((field.heights[boxman.x] + 1) * 16), sprites.eraser);
     drawSprite((boxman.x + 1) * 16, document.getElementById("game").height - ((field.heights[boxman.x] + 2) * 16) + (boxman.carrying), sprites.guy1);
     drawSprite((boxman.x + 1) * 16, document.getElementById("game").height - ((field.heights[boxman.x] + 2) * 16) + (16 - boxman.carrying), sprites.box);
-    boxman.carrying+=2;
+    boxman.carrying += 2;
     if (boxman.carrying > 16) {
-    	field.heights[boxman.x]--;
+      field.heights[boxman.x]--;
       boxman.carrying = -2;
       boxman.screeny = document.getElementById("game").height - (field.heights[boxman.x] * 16) - 32
     }
@@ -387,11 +397,11 @@ function setDown() {
   if (boxman.carrying > 16) {
     drawSprite((boxman.x + 1) * 16, document.getElementById("game").height - ((field.heights[boxman.x] + 2) * 16), sprites.eraser);
     drawSprite((boxman.x + 1) * 16, document.getElementById("game").height - ((field.heights[boxman.x] + 2) * 16) + (boxman.carrying - 49), sprites.eraser);
-    drawSprite((boxman.x + 1) * 16, document.getElementById("game").height - ((field.heights[boxman.x] + 2) * 16) + (17-boxman.carrying), sprites.guy1);
+    drawSprite((boxman.x + 1) * 16, document.getElementById("game").height - ((field.heights[boxman.x] + 2) * 16) + (17 - boxman.carrying), sprites.guy1);
     drawSprite((boxman.x + 1) * 16, document.getElementById("game").height - ((field.heights[boxman.x] + 2) * 16) + (boxman.carrying - 33), sprites.box);
-    boxman.carrying+=2;
+    boxman.carrying += 2;
     if (boxman.carrying > 33) {
-    	field.heights[boxman.x]++;
+      field.heights[boxman.x]++;
       boxman.carrying = -1;
       boxman.screeny = document.getElementById("game").height - (field.heights[boxman.x] * 16) - 32
     }
@@ -441,7 +451,7 @@ function init() {
     moving: "",
     frame: 0,
     columnDif: 0,
-  	carrying: -1
+    carrying: -1
   };
 
   box = {
@@ -468,4 +478,5 @@ var score = 0;
 var highscore = 2000
 var gameOverString = "";
 var imgData = 0;
+var queue = 0;
 var alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
