@@ -2,12 +2,12 @@
   <link rel="stylesheet" type="text/css" href="style.css">
   <link rel="shortcut icon" href="https://raw.githubusercontent.com/Paskach/Boxman/master/images/box.png" type="image/x-icon">
   <title>Boxman</title>
-  <div style="padding: 5px; text-align: center">
-  <canvas width="224" height="288" style="background-color: black; border: solid 1px #0077ff" id="game">
+  <div style="padding: 5px; text-align: center; font-family:Verdana" id="div1">
+  <canvas width="224" height="288" style="background-color: black; border: solid 1px #0077ff;" id="game">
     No canvas support to be found :(
   </canvas>
-  <div style="padding: 5px">
-    <button id="button" onclick="startGame(); document.getElementById('button').remove();" style="width: 100px; height: 50px; border: solid 1px #0077ff;">
+  <div style="padding: 5px;">
+    <button id="button" onclick='document.getElementById("div1").innerHTML+="<input type=\"checkbox\" id=\"fullscreen\">Fullscreen</input>"; document.getElementById("button").remove(); startGame()' style="width: 100px; height: 50px; border: solid 1px #0077ff;">
       PLAY!
     </button>
   </div>
