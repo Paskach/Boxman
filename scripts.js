@@ -66,12 +66,12 @@ function startGame() {
             //setDown();
           }
         }
-        if(queue.charAt(0) == "s" && field.heights[boxman.x] == 0 && !boxman.jumping)
-        {
-        queue = queue.slice(2);
+        if (queue.charAt(0) == "s" && field.heights[boxman.x] == 0 && !boxman.jumping) {
+          queue = queue.slice(2);
         }
       }
       document.getElementById("debug").innerHTML = queue;
+      fullscreen();
     } // end frame code
   var x = setInterval(frame, 16);
 
@@ -412,6 +412,29 @@ function setDown() {
   }
 }
 
+function jsUpdateSize() {
+  // Get the dimensions of the viewport
+  width = window.innerWidth ||
+    document.documentElement.clientWidth ||
+    document.body.clientWidth;
+  height = window.innerHeight ||
+    document.documentElement.clientHeight ||
+    document.body.clientHeight;
+};
+
+function fullscreen()
+{
+if(document.getElementById("fullscreen").checked)
+{
+jsUpdateSize();
+document.getElementById("game").style = "background-color: black; border: solid 1px #0077ff; height:"+(height-50);
+}
+else
+{
+document.getElementById("game").style = "background-color: black; border: solid 1px #0077ff;";
+}
+}
+
 class Sprites {
   constructor() {}
   get box() {
@@ -483,4 +506,6 @@ var highscore = 2000
 var gameOverString = "";
 var imgData = 0;
 var queue = 0;
+var width = 0;
+var height = 0;
 var alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
