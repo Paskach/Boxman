@@ -32,9 +32,11 @@ function startGame() {
         }
         textPrint((document.getElementById("game").width / 2) - 40, 0, sprites.font1, "high score");
         textPrint(16, 0, sprites.font1, "1up");
+        textPrint(document.getElementById("game").width - (8 * 8), 0, sprites.font1, "tunnel");
         textPrint(40 - (8 * score.toString().length), 8, sprites.font, score + "0");
         textPrint(((document.getElementById("game").width / 2) - 24) - (8 * (highscore.toString().length - 5)), 8, sprites.font, highscore + "0");
         textPrint((document.getElementById("game").width / 2) - 40, 160, sprites.font1, gameOverString);
+        drawTunnelBar();
         if (!running) {
           clearInterval(x);
           die();
@@ -52,6 +54,13 @@ function startGame() {
         }
         if (queue.charAt(0) == "a" && !boxman.jumping && boxman.carrying < 0) {
           moveLeft();
+          queue = queue.slice(2);
+        }
+        if (queue.charAt(0) == "p") {
+          if (!boxman.jumping && boxman.carrying == -1 && tunnel == 48) {
+            hyperspace();
+            tunnel = 0;
+          }
           queue = queue.slice(2);
         }
         if (queue.charAt(0) == "s" && !boxman.jumping && boxman.carrying < 0) {
@@ -140,6 +149,9 @@ function checkBoxCollide() {
     box.y = 32;
     field.heights[box.x]++;
     box.x = Math.floor(Math.random() * 12);
+    if (tunnel < 48) {
+      tunnel++;
+    }
     while (field.heights[box.x] > 9) {
       box.x = Math.floor(Math.random() * 12);
     }
@@ -422,19 +434,35 @@ function jsUpdateSize() {
     document.body.clientHeight;
 };
 
-function fullscreen()
-{
-if(document.getElementById("fullscreen").checked)
-{
-jsUpdateSize();
-document.getElementById("game").style = "background-color: black; border: solid 1px #0077ff; height:"+(height-50);
-}
-else
-{
-document.getElementById("game").style = "background-color: black; border: solid 1px #0077ff;";
-}
+function fullscreen() {
+  if (document.getElementById("fullscreen").checked) {
+    jsUpdateSize();
+    document.getElementById("game").style = "background-color: black; border: solid 1px #0077ff; height:" + (height - 50);
+  } else {
+    document.getElementById("game").style = "background-color: black; border: solid 1px #0077ff;";
+  }
 }
 
+function hyperspace() {
+  boxman.screenx = (boxman.x + 1) * 16;
+  drawSprite(boxman.screenx, document.getElementById("game").height - (field.heights[boxman.x] + 2) * 16, sprites.eraser);
+  boxman.x = Math.floor(Math.random() * 12);
+  boxman.screenx = (boxman.x + 1) * 16;
+}
+
+function drawTunnelBar() {
+  var ctx = document.getElementById("game").getContext("2d")
+  ctx.fillStyle = "#000000";
+  ctx.fillRect(document.getElementById("game").width - 63.5, 9.5, 48, 6);
+  ctx.stroke();
+  ctx.rect(document.getElementById("game").width - 63.5, 9.5, 48, 6);
+  ctx.strokeStyle = "#F8F8F8";
+  ctx.fillStyle = "#F8F8F8";
+  ctx.lineWidth = 1;
+  ctx.stroke();
+  ctx.fillRect(document.getElementById("game").width - 63.5, 9.5, tunnel - .5, 6);
+  ctx.stroke();
+}
 class Sprites {
   constructor() {}
   get box() {
@@ -495,6 +523,7 @@ function init() {
     bonus: 0
   };
   gameOverString = "";
+  tunnel = 0;
   document.getElementById("game").getContext("2d").drawImage(sprites.eraser, 0, 0, document.getElementById("game").width, document.getElementById("game").height);
   startGame(); //change this to title screen
 }
@@ -508,4 +537,5 @@ var imgData = 0;
 var queue = 0;
 var width = 0;
 var height = 0;
+var tunnel = 0;
 var alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
