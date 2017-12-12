@@ -97,6 +97,7 @@ function startGame() {
 
 var boxman = {
   x: 0,
+  oldx: 0,
   screeny: 0,
   screenx: 0,
   sprite: "1",
@@ -444,24 +445,33 @@ function fullscreen() {
 }
 
 function hyperspace() {
+  boxman.oldx = boxman.x;
   boxman.screenx = (boxman.x + 1) * 16;
   drawSprite(boxman.screenx, document.getElementById("game").height - (field.heights[boxman.x] + 2) * 16, sprites.eraser);
-  boxman.x = Math.floor(Math.random() * 12);
+  while (boxman.x == boxman.oldx) {
+    boxman.x = Math.floor(Math.random() * 12);
+  }
   boxman.screenx = (boxman.x + 1) * 16;
 }
 
 function drawTunnelBar() {
-  var ctx = document.getElementById("game").getContext("2d")
-  ctx.fillStyle = "#000000";
-  ctx.fillRect(document.getElementById("game").width - 63.5, 9.5, 48, 6);
-  ctx.stroke();
-  ctx.rect(document.getElementById("game").width - 63.5, 9.5, 48, 6);
-  ctx.strokeStyle = "#F8F8F8";
-  ctx.fillStyle = "#F8F8F8";
-  ctx.lineWidth = 1;
-  ctx.stroke();
-  ctx.fillRect(document.getElementById("game").width - 63.5, 9.5, tunnel - .5, 6);
-  ctx.stroke();
+  drawSprite(document.getElementById("game").width - 64, 10, sprites.tunnel);
+  for (var i = 0; i < tunnel && i < 48; i++) {
+    drawSprite(document.getElementById("game").width - 63 + i, 10, sprites.tunnelFill);
+  }
+  /*tcx = document.getElementById("game").getContext("2d");
+  tcx.clearRect(document.getElementById("game").width - 63.5, 9.5, 48, 6);
+  tcx.fillStyle = "#000000";
+  tcx.fillRect(document.getElementById("game").width - 63.5, 9.5, 48, 6);
+  tcx.stroke();
+  tcx.rect(document.getElementById("game").width - 63.5, 9.5, 48, 6);
+  tcx.strokeStyle = "#F8F8F8";
+  tcx.fillStyle = "#F8F8F8";
+  tcx.lineWidth = 1;
+  tcx.stroke();
+  tcx.fillRect(document.getElementById("game").width - 63.5, 9.5, tunnel - .5, 6);
+  tcx.stroke();
+  */
 }
 class Sprites {
   constructor() {}
@@ -492,6 +502,12 @@ class Sprites {
   get font1() {
     return document.getElementById("font1");
   }
+  get tunnel() {
+    return document.getElementById("tunnel");
+  }
+  get tunnelFill() {
+    return document.getElementById("tunnelFill");
+  }
 }
 
 function init() {
@@ -499,6 +515,7 @@ function init() {
   score = 0;
   boxman = {
     x: 0,
+    oldx: 0,
     screeny: 0,
     screenx: 0,
     sprite: "1",
@@ -538,4 +555,5 @@ var queue = 0;
 var width = 0;
 var height = 0;
 var tunnel = 0;
+var tcx;
 var alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
