@@ -345,7 +345,7 @@ function redrawTops() { //change this to detect what block it needs to draw
 }
 
 function checkIfDead() {
-  if (box.y == document.getElementById("game").height - (field.heights[boxman.x] * 16) - 32 && boxman.sprite == 4) {
+  if (box.y == document.getElementById("game").height - (field.heights[boxman.x] * 16) - 32 && boxman.sprite == 4 && !boxman.jumping) {
     drawSprite((boxman.x + 1) * 16, document.getElementById("game").height - (field.heights[boxman.x] * 16) - 16, sprites.blood);
     drawSprite((boxman.x + 1) * 16, document.getElementById("game").height - (field.heights[boxman.x] * 16) - 32, sprites.box);
     running = false;
@@ -528,7 +528,7 @@ function init() {
 
   box = {
     x: 0,
-    y: 0,
+    y: 32,
     vel: 0,
     type: "normal"
   };
