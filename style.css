@@ -4,3 +4,7 @@ img {
 textarea{
   display: none;
 }
+@font-face{
+  font-family: Emulogic;
+  src: url('https://github.com/Paskach/Boxman/blob/master/emulogic.ttf');
+}
