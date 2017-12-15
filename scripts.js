@@ -345,7 +345,7 @@ function redrawTops() { //change this to detect what block it needs to draw
 }
 
 function checkIfDead() {
-  if (box.y == document.getElementById("game").height - (field.heights[boxman.x] * 16) - 32 && boxman.sprite == 4 && !boxman.jumping) {
+  if (box.y == document.getElementById("game").height - (field.heights[boxman.x] * 16) - 32 && boxman.sprite == 4) {
     drawSprite((boxman.x + 1) * 16, document.getElementById("game").height - (field.heights[boxman.x] * 16) - 16, sprites.blood);
     drawSprite((boxman.x + 1) * 16, document.getElementById("game").height - (field.heights[boxman.x] * 16) - 32, sprites.box);
     running = false;
@@ -363,8 +363,10 @@ function textPrint(x, y, sprite, string) {
 
 function die() {
   setTimeout(function() {
-    init();
-  }, 2500);
+    document.getElementById("game").getContext("2d").drawImage(sprites.eraser, 0, 0, document.getElementById("game").width, document.getElementById("game").height);
+    gameOverString = "";
+    checkHighScores(); //init();
+  }, 4000);
 }
 
 function scroll() {
@@ -459,20 +461,108 @@ function drawTunnelBar() {
   for (var i = 0; i < tunnel && i < 48; i++) {
     drawSprite(document.getElementById("game").width - 63 + i, 10, sprites.tunnelFill);
   }
-  /*tcx = document.getElementById("game").getContext("2d");
-  tcx.clearRect(document.getElementById("game").width - 63.5, 9.5, 48, 6);
-  tcx.fillStyle = "#000000";
-  tcx.fillRect(document.getElementById("game").width - 63.5, 9.5, 48, 6);
-  tcx.stroke();
-  tcx.rect(document.getElementById("game").width - 63.5, 9.5, 48, 6);
-  tcx.strokeStyle = "#F8F8F8";
-  tcx.fillStyle = "#F8F8F8";
-  tcx.lineWidth = 1;
-  tcx.stroke();
-  tcx.fillRect(document.getElementById("game").width - 63.5, 9.5, tunnel - .5, 6);
-  tcx.stroke();
-  */
 }
+
+function checkHighScores() {
+  var i = 0;
+  for (i = 0; i <= 4; i += 1) {
+    if (score >= highscores[i]) {
+      break;
+    }
+  }
+  if (i != 5) {
+    highscores.splice(i, 0, score);
+    highnames.splice(i, 0, "new");
+    highscores.splice(5, 1);
+    highnames.splice(5, 1);
+    console.log(highscores);
+    highScoreTable(true);
+    var myName = "aaa";
+    var enterLetter = 0;
+    var counter = 0;
+    var text = 0;
+    document.onkeypress = function(evt) {
+      evt = evt || window.event;
+      var charCode = evt.keyCode || evt.which;
+      var charStr = String.fromCharCode(charCode);
+      if (charStr == "s") {
+        enterLetter++;
+        updateScores(myName.substr(0, enterLetter));
+      }
+      if (charStr == "d") {
+        myName = myName.substr(0, enterLetter) + alphabet[alphabet.indexOf(myName.charAt(enterLetter)) + 1] + myName.substr(enterLetter + 1, 2);
+      }
+      if (charStr == "a") {
+        myName = myName.substr(0, enterLetter) + alphabet[alphabet.indexOf(myName.charAt(enterLetter)) - 1] + myName.substr(enterLetter + 1, 2);
+      }
+    }
+    var loop = setInterval(function() {
+      counter++;
+      if (counter < 10) {
+        text = sprites.font3;
+      } else {
+        text = sprites.font2;
+        if (counter > 20) {
+          counter = 0;
+        }
+      }
+      textPrint(80 - (score.toString().length * 8), 88, sprites.font3, score + "0");
+      textPrint(152, 88, sprites.font3, myName);
+      textPrint(152 + (8 * enterLetter), 88, text, myName.charAt(enterLetter));
+
+      if (enterLetter > 2 && enterLetter != 10) {
+      	enterLetter = 10;
+        var pauser = 0;
+        var pause = setInterval(function() {
+          pauser++;
+          if (pauser > 200) {
+          	pauser = 0
+            clearInterval(pause);
+            clearInterval(loop);
+            highnames[i] = myName;
+            init();
+          }
+        }, 16);
+      }
+    }, 16);
+  } else {
+    titleScreen()
+  }
+}
+
+function highScoreTable(game) {
+  if (game) {
+    textPrint(32, 48, sprites.font1, "enter your initials !");
+    textPrint(48, 72, sprites.font3, "score");
+    textPrint(144, 72, sprites.font3, "name");
+  }
+  textPrint(88, 144, sprites.font1, "top 5");
+  textPrint(72, 160, sprites.font3, "score");
+  textPrint(152, 160, sprites.font3, "name");
+  textPrint((document.getElementById("game").width / 2) - 40, 0, sprites.font1, "high score");
+  textPrint(16, 0, sprites.font1, "1up");
+  textPrint(40 - (8 * score.toString().length), 8, sprites.font, score + "0");
+  textPrint(((document.getElementById("game").width / 2) - 24) - (8 * (highscores[0].toString().length - 5)), 8, sprites.font, highscores[0] + "0");
+  updateScores("");
+}
+
+function updateScores(name) {
+  var nums = ["1st", "2nd", "3rd", "4th", "5th"];
+  var myRow = highscores.indexOf(score);
+  for (var i = 0; i <= 4; i++) {
+    if (i == myRow) {
+      textPrint(16, 176 + (16 * i), sprites.font2, nums[i]);
+      textPrint(104 - (8 * score.toString().length), 176 + (16 * i), sprites.font2, score.toString() + "0");
+      textPrint(160, 176 + (16 * i), sprites.font2, name);
+    } else {
+      textPrint(16, 176 + (16 * i), sprites.font3, nums[i]);
+      textPrint(104 - (8 * highscores[i].toString().length), 176 + (16 * i), sprites.font3, highscores[i].toString() + "0");
+      textPrint(160, 176 + (16 * i), sprites.font3, highnames[i]);
+    }
+  }
+  //textPrint(0, 0, sprites.font1, " ");
+}
+
 class Sprites {
   constructor() {}
   get box() {
@@ -502,11 +592,20 @@ class Sprites {
   get font1() {
     return document.getElementById("font1");
   }
+  get font2() {
+    return document.getElementById("font2");
+  }
+  get font3() {
+    return document.getElementById("font3");
+  }
   get tunnel() {
     return document.getElementById("tunnel");
   }
   get tunnelFill() {
     return document.getElementById("tunnelFill");
+  }
+  get logo() {
+    return document.getElementById("logo");
   }
 }
 
@@ -528,7 +627,7 @@ function init() {
 
   box = {
     x: 0,
-    y: 32,
+    y: 0,
     vel: 0,
     type: "normal"
   };
@@ -539,16 +638,55 @@ function init() {
     scrolling: 0,
     bonus: 0
   };
+  highscore = highscores[0];
   gameOverString = "";
   tunnel = 0;
   document.getElementById("game").getContext("2d").drawImage(sprites.eraser, 0, 0, document.getElementById("game").width, document.getElementById("game").height);
-  startGame(); //change this to title screen
+  titleScreen();
+}
+
+function titleScreen() {
+  document.getElementById("game").getContext("2d").drawImage(sprites.eraser, 0, 0, document.getElementById("game").width, document.getElementById("game").height);
+
+  textPrint((document.getElementById("game").width / 2) - 40, 0, sprites.font1, "high score");
+  textPrint(16, 0, sprites.font1, "1up");
+  textPrint(40 - (8 * score.toString().length), 8, sprites.font, score + "0");
+  textPrint(((document.getElementById("game").width / 2) - 24) - (8 * (highscore.toString().length - 5)), 8, sprites.font, highscore + "0");
+  textPrint((document.getElementById("game").width / 2) - 40, 160, sprites.font1, gameOverString);
+  var counter = 0;
+  document.onkeypress = function(evt) {
+    evt = evt || window.event;
+    var charCode = evt.keyCode || evt.which;
+    var charStr = String.fromCharCode(charCode);
+    if (charStr == "s") {
+      clearInterval(title);
+      document.getElementById("game").getContext("2d").drawImage(sprites.eraser, 0, 0, document.getElementById("game").width, document.getElementById("game").height);
+      startGame();
+    }
+  }
+  var title = setInterval(function() {
+    //title screen animation code
+    counter++;
+    if (counter < 50) {
+      drawSprite((224 - 128) / 2, counter + 30, sprites.logo);
+    }
+    if (counter > 50) {
+      var toPrint = "get as high as you can !";
+      textPrint(8 * Math.floor(((224 - (toPrint.length * 8)) / 2) / 8), 120, sprites.font1, toPrint);
+      toPrint = "more points per box";
+      textPrint(8 * Math.floor(((224 - (toPrint.length * 8)) / 2) / 8), 136, sprites.font1, toPrint);
+      toPrint = "the higher you climb !";
+      textPrint(8 * Math.floor(((224 - (toPrint.length * 8)) / 2) / 8), 144, sprites.font1, toPrint);
+    }
+  }, 16);
 }
 
 const sprites = new Sprites();
 var running = false;
 var score = 0;
-var highscore = 2000
+var highscores = [1, 1, 1, 1, 1];
+var highnames = ["111", "222", "333", "444", "555"]
+var highscore = 0;
 var gameOverString = "";
 var imgData = 0;
 var queue = 0;
@@ -556,4 +694,4 @@ var width = 0;
 var height = 0;
 var tunnel = 0;
 var tcx;
-var alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+var alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '!', '', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
