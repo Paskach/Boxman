@@ -148,6 +148,7 @@ function checkBoxCollide() {
     box.vel = 0;
     drawSprite((box.x + 1) * 16, box.y, sprites.box)
     box.y = 32;
+    boxHit.play();
     field.heights[box.x]++;
     box.x = Math.floor(Math.random() * 12);
     if (tunnel < 48) {
@@ -703,4 +704,6 @@ var width = 0;
 var height = 0;
 var tunnel = 0;
 var tcx;
+var boxHit = new Audio('paskach.github.io/Boxman/BoxHit.wav');
+var pickup = new Audio('paskach.github.io/Boxman/Randomize248.wav');
 var alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '!', '', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
