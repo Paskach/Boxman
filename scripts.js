@@ -702,8 +702,8 @@ function titleScreen() {
 const sprites = new Sprites();
 var running = false;
 var score = 0;
-var highscores = [10, 10, 10, 10, 10];
-var highnames = ["111", "222", "333", "444", "555"]
+var highscores = [2000, 2000, 2000, 2000, 2000];
+var highnames = ["box", "man", "box", "man", "box"]
 var highscore = highscores[0];
 var gameOverString = "";
 var imgData = 0;
