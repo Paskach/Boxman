@@ -1,23 +1,20 @@
-<script src="scripts.js"></script>
+<html><head><script src="scripts.js"></script>
 <link rel="stylesheet" type="text/css" href="style.css">
 <link rel="preload" href="https://raw.githubusercontent.com/Paskach/Boxman/master/sounds/BoxHit.wav" as="audio">
 <link rel="preload" href="https://raw.githubusercontent.com/Paskach/Boxman/master/sounds/Randomize248.wav" as="audio">
 <link rel="preload" href="emulogic.ttf" as="font">
-<audio src="https://raw.githubusercontent.com/Paskach/Boxman/master/sounds/BoxHit.wav"></audio>
+</head><body><audio src="https://raw.githubusercontent.com/Paskach/Boxman/master/sounds/BoxHit.wav"></audio>
 <link rel="shortcut icon" href="https://raw.githubusercontent.com/Paskach/Boxman/master/images/box.png" type="image/x-icon">
 <title>Boxman</title>
-<div style="padding: 5px; text-align: center; font-family:Verdana" id="div1">
-  <canvas width="224" height="288" style="background-color: black; border: solid 1px #0077ff;" id="game">
+<div style="padding: 5px; text-align: center; font-family:Emulogic; font-size: 8px" id="div1"><canvas width="224" height="288" style="background-color: black; border: 1px solid rgb(0, 119, 255);" id="game">
     No canvas support to be found :(
   </canvas>
   <div style="padding: 5px;">
-    <button id="button" onclick='document.getElementById("div1").innerHTML+="<input type=\"checkbox\" id=\"fullscreen\">Fullscreen</input>"; document.getElementById("button").remove(); titleScreen()' style="width: 100px; height: 50px; border: solid 1px #0077ff;">
-      PLAY!
-    </button>
+    
   </div>
-</div>
+<input type="checkbox" id="fullscreen">Fullscreen</div>
 <div>
-  <textarea readonly rows="10" cols="60" id="debug"></textarea>
+  <textarea readonly="" rows="10" cols="60" id="debug"></textarea>
 </div>
 <div>
   <img id="box" src="https://raw.githubusercontent.com/Paskach/Boxman/master/images/box.png">
@@ -35,3 +32,4 @@
   <img id="tunnelFill" src="https://raw.githubusercontent.com/Paskach/Boxman/master/images/tunnelFill.png">
   <img id="logo" src="https://raw.githubusercontent.com/Paskach/Boxman/master/images/logo.png">
 </div>
+</body></html>
