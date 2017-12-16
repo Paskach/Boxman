@@ -400,6 +400,10 @@ function scroll() {
 
 function pickup() {
   if (boxman.carrying > -1 && boxman.carrying < 17) {
+    if(boxman.carrying == 0)
+    {
+      pickUp.play();
+    }
     drawSprite((boxman.x + 1) * 16, document.getElementById("game").height - ((field.heights[boxman.x] + 2) * 16) + (boxman.carrying - 1), sprites.eraser);
     drawSprite((boxman.x + 1) * 16, document.getElementById("game").height - ((field.heights[boxman.x] + 1) * 16), sprites.eraser);
     drawSprite((boxman.x + 1) * 16, document.getElementById("game").height - ((field.heights[boxman.x] + 2) * 16) + (boxman.carrying), sprites.guy1);
@@ -415,6 +419,10 @@ function pickup() {
 
 function setDown() {
   if (boxman.carrying > 16) {
+    if(boxman.carrying == 17)
+    {
+      pickUp.play();
+    }
     drawSprite((boxman.x + 1) * 16, document.getElementById("game").height - ((field.heights[boxman.x] + 2) * 16), sprites.eraser);
     drawSprite((boxman.x + 1) * 16, document.getElementById("game").height - ((field.heights[boxman.x] + 2) * 16) + (boxman.carrying - 49), sprites.eraser);
     drawSprite((boxman.x + 1) * 16, document.getElementById("game").height - ((field.heights[boxman.x] + 2) * 16) + (17 - boxman.carrying), sprites.guy1);
@@ -704,6 +712,6 @@ var width = 0;
 var height = 0;
 var tunnel = 0;
 var tcx;
-var boxHit = new Audio('paskach.github.io/Boxman/BoxHit.wav');
-var pickup = new Audio('paskach.github.io/Boxman/Randomize248.wav');
+var boxHit = new Audio('https://paskach.github.io/Boxman/BoxHit.wav');
+var pickUp = new Audio('https://paskach.github.io/Boxman/Randomize248.wav');
 var alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '!', '', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
