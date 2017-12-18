@@ -724,18 +724,23 @@ const sprites = new Sprites();
 var running = false;
 var score = 0;
 var cookieHighscores = getCookie("highscores");
-if (cookieHighscores = "") {
+if (cookieHighscores == "") {
   var highscores = [2000, 2000, 2000, 2000, 2000];
 } else {
   var highscores = cookieHighscores.split(',').map(Number);
 }
 var cookieHighnames = getCookie("highnames");
-if (cookieHighnames = "") {
+if (cookieHighnames == "") {
   var highnames = highnames = ["box", "man", "box", "man", "box"];
 } else {
   var highnames = cookieHighnames.split(',');
 }
 var highscore = highscores[0];
+console.log(document.cookie);
+console.log(cookieHighscores);
+console.log(cookieHighnames);
+console.log(highscores);
+console.log(highnames);
 var gameOverString = "";
 var imgData = 0;
 var queue = 0;
