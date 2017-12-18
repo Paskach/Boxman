@@ -400,8 +400,7 @@ function scroll() {
 
 function pickup() {
   if (boxman.carrying > -1 && boxman.carrying < 17) {
-    if(boxman.carrying == 0)
-    {
+    if (boxman.carrying == 0) {
       pickUp.play();
     }
     drawSprite((boxman.x + 1) * 16, document.getElementById("game").height - ((field.heights[boxman.x] + 2) * 16) + (boxman.carrying - 1), sprites.eraser);
@@ -419,8 +418,7 @@ function pickup() {
 
 function setDown() {
   if (boxman.carrying > 16) {
-    if(boxman.carrying == 17)
-    {
+    if (boxman.carrying == 17) {
       pickUp.play();
     }
     drawSprite((boxman.x + 1) * 16, document.getElementById("game").height - ((field.heights[boxman.x] + 2) * 16), sprites.eraser);
@@ -499,14 +497,13 @@ function checkHighScores() {
         updateScores(myName.substr(0, enterLetter));
       }
       if (charStr == "d") {
-        myName = myName.substr(0, enterLetter) + alphabet[(alphabet.indexOf(myName.charAt(enterLetter)) + 1)%26] + myName.substr(enterLetter + 1, 2);
+        myName = myName.substr(0, enterLetter) + alphabet[(alphabet.indexOf(myName.charAt(enterLetter)) + 1) % 26] + myName.substr(enterLetter + 1, 2);
       }
       if (charStr == "a") {
-      if(myName.charAt(enterLetter)!="a")
-      {
-        myName = myName.substr(0, enterLetter) + alphabet[alphabet.indexOf(myName.charAt(enterLetter)) - 1] + myName.substr(enterLetter + 1, 2);} else
-        {
-        myName = myName.substr(0, enterLetter) + "z" + myName.substr(enterLetter + 1, 2);
+        if (myName.charAt(enterLetter) != "a") {
+          myName = myName.substr(0, enterLetter) + alphabet[alphabet.indexOf(myName.charAt(enterLetter)) - 1] + myName.substr(enterLetter + 1, 2);
+        } else {
+          myName = myName.substr(0, enterLetter) + "z" + myName.substr(enterLetter + 1, 2);
         }
       }
     }
@@ -525,23 +522,25 @@ function checkHighScores() {
       textPrint(152 + (8 * enterLetter), 88, text, myName.charAt(enterLetter));
 
       if (enterLetter > 2 && enterLetter != 10) {
-      	enterLetter = 10;
+        enterLetter = 10;
         var pauser = 0;
         var pause = setInterval(function() {
           pauser++;
           if (pauser > 200) {
-          	pauser = 0
+            pauser = 0
             clearInterval(pause);
             clearInterval(loop);
             highnames[i] = myName;
             init();
             titleScreen();
+            setCookie("highnames", highnames, 2000);
+            setCookie("highscores", highscores, 2000);
           }
         }, 16);
       }
     }, 16);
   } else {
-  init();
+    init();
     titleScreen();
   }
 }
@@ -694,16 +693,48 @@ function titleScreen() {
       toPrint = "the higher you climb !";
       textPrint(8 * Math.floor(((224 - (toPrint.length * 8)) / 2) / 8), 144, sprites.font1, toPrint);
       toPrint = "start";
-      textPrint(8 * Math.floor(((224 - (toPrint.length * 8)) / 2) / 8), 184, fonts[Math.floor(counter/6)%4], toPrint);
+      textPrint(8 * Math.floor(((224 - (toPrint.length * 8)) / 2) / 8), 184, fonts[Math.floor(counter / 6) % 4], toPrint);
     }
   }, 16);
+}
+
+function setCookie(cname, cvalue, exdays) {
+  var d = new Date();
+  d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+  var expires = "expires=" + d.toUTCString();
+  document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
+
+function getCookie(cname) {
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for(var i = 0; i < ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
 }
 
 const sprites = new Sprites();
 var running = false;
 var score = 0;
-var highscores = [2000, 2000, 2000, 2000, 2000];
-var highnames = ["box", "man", "box", "man", "box"]
+var cookieHighscores = getCookie("highscores");
+if (cookieHighscores = "") {
+  var highscores = [2000, 2000, 2000, 2000, 2000];
+} else {
+  var highscores = cookieHighscores;
+}
+var cookieHighnames = getCookie("highnames");
+if (cookieHighnames = "") {
+  var highnames = highnames = ["box", "man", "box", "man", "box"];
+} else {
+  var highnames = cookieHighnames;
+}
 var highscore = highscores[0];
 var gameOverString = "";
 var imgData = 0;
