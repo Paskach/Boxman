@@ -727,13 +727,13 @@ var cookieHighscores = getCookie("highscores");
 if (cookieHighscores = "") {
   var highscores = [2000, 2000, 2000, 2000, 2000];
 } else {
-  var highscores = cookieHighscores;
+  var highscores = cookieHighscores.split(',').map(Number);
 }
 var cookieHighnames = getCookie("highnames");
 if (cookieHighnames = "") {
   var highnames = highnames = ["box", "man", "box", "man", "box"];
 } else {
-  var highnames = cookieHighnames;
+  var highnames = cookieHighnames.split(',');
 }
 var highscore = highscores[0];
 var gameOverString = "";
