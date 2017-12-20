@@ -83,6 +83,10 @@ function startGame() {
           queue = queue.slice(2);
         }
       }
+      var keys = ["a","s","d","p"];
+      if (keys.indexOf(queue.charAt(0)) < 0) {
+          queue = queue.slice(2);
+        }
       document.getElementById("debug").innerHTML = queue;
       fullscreen();
     } // end frame code
