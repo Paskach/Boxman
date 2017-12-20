@@ -22,7 +22,11 @@ function startGame() {
         } else {
           moveBoxman();
         }
-        box.vel += .25;
+        if (field.bonus < 15) {
+          box.vel += .15;
+        } else {
+          box.vel += field.bonus / 100;
+        }
         box.y += Math.floor(box.vel);
         checkBoxCollide();
         drawFallingBox();
