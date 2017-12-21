@@ -3,10 +3,19 @@ function startGame() {
     return;
   }
   boxman.screenx = (boxman.x + 1) * 16;
-  box.x = Math.floor(Math.random() * 12);
+  box.x = -1
   running = true;
   drawBorders();
+  var boxDelay = 0;
   var frame = function() { //Code to execute every frame
+      if (boxDelay <= 125) {
+        boxDelay++;
+      }
+      if (boxDelay == 124) {
+        box.x = Math.floor(Math.random() * 12);
+      }
+      //boxDelay = -2;
+
       if (field.heights[boxman.x] > 4 && field.scrolling == 0 & !boxman.jumping) {
         field.scrolling = 1;
       }
@@ -22,14 +31,16 @@ function startGame() {
         } else {
           moveBoxman();
         }
-        if (field.bonus < 15) {
-          box.vel += .15;
-        } else {
-          box.vel += field.bonus / 100;
+        if (boxDelay > 125) {
+          if (field.bonus < 15) {
+            box.vel += .15;
+          } else {
+            box.vel += field.bonus / 100;
+          }
+          box.y += Math.floor(box.vel);
+          checkBoxCollide();
+          drawFallingBox();
         }
-        box.y += Math.floor(box.vel);
-        checkBoxCollide();
-        drawFallingBox();
         redrawTops();
         if (score > highscore) {
           highscore = score;
@@ -83,12 +94,12 @@ function startGame() {
           queue = queue.slice(2);
         }
       }
-      var keys = ["a","s","d","p"];
+      var keys = ["a", "s", "d", "p"];
       if (keys.indexOf(queue.charAt(0)) < 0) {
-          queue = queue.slice(2);
-        }
-      document.getElementById("debug").innerHTML = queue;
+        queue = queue.slice(2);
+      }
       fullscreen();
+      document.getElementById("debug").innerHTML = queue;
     } // end frame code
   var x = setInterval(frame, 16);
 
@@ -223,6 +234,7 @@ function moveBoxman() {
     }
     if (boxman.frame == 3) {
       drawSprite(boxman.screenx, boxman.screeny, sprites.guy2);
+      jumpSound.play();
     }
     if (boxman.frame == 4) {
       drawSprite(boxman.screenx, boxman.screeny, sprites.guy1);
@@ -290,6 +302,7 @@ function moveBoxman() {
     }
     if (boxman.frame == 3) {
       drawSprite(boxman.screenx, boxman.screeny, sprites.guy2);
+      jumpSound.play();
     }
     if (boxman.frame == 4) {
       drawSprite(boxman.screenx, boxman.screeny, sprites.guy1);
@@ -681,12 +694,22 @@ function titleScreen() {
     var charCode = evt.keyCode || evt.which;
     var charStr = String.fromCharCode(charCode);
     if (charStr == "s") {
-      clearInterval(title);
+    	introSound.play();
+      var introDelayer = 0;
+      var introDelay = setInterval(function() {
+      	introDelayer++;
+      	if(introDelayer > 10)
+      	{
+      		clearInterval(introDelay);
+          clearInterval(title);
       document.getElementById("game").getContext("2d").drawImage(sprites.eraser, 0, 0, document.getElementById("game").width, document.getElementById("game").height);
       startGame();
+      	}
+      }, 100);
     }
   }
   var title = setInterval(function() {
+    fullscreen();
     //title screen animation code
     counter++;
     var fonts = [sprites.font, sprites.font1, sprites.font2, sprites.font3];
@@ -714,18 +737,18 @@ function setCookie(cname, cvalue, exdays) {
 }
 
 function getCookie(cname) {
-    var name = cname + "=";
-    var ca = document.cookie.split(';');
-    for(var i = 0; i < ca.length; i++) {
-        var c = ca[i];
-        while (c.charAt(0) == ' ') {
-            c = c.substring(1);
-        }
-        if (c.indexOf(name) == 0) {
-            return c.substring(name.length, c.length);
-        }
+  var name = cname + "=";
+  var ca = document.cookie.split(';');
+  for (var i = 0; i < ca.length; i++) {
+    var c = ca[i];
+    while (c.charAt(0) == ' ') {
+      c = c.substring(1);
     }
-    return "";
+    if (c.indexOf(name) == 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return "";
 }
 
 const sprites = new Sprites();
@@ -758,4 +781,7 @@ var tunnel = 0;
 var tcx;
 var boxHit = new Audio('https://paskach.github.io/Boxman/BoxHit.wav');
 var pickUp = new Audio('https://paskach.github.io/Boxman/Randomize248.wav');
+var jumpSound = new Audio('https://paskach.github.io/Boxman/Jump.wav');
+var warningSound = new Audio('https://paskach.github.io/Boxman/Warning.wav');
+var introSound = new Audio('https://paskach.github.io/Boxman/Intro.wav');
 var alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '!', '', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
