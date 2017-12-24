@@ -7,11 +7,12 @@ function startGame() {
   running = true;
   drawBorders();
   var boxDelay = 0;
+  introJingle.play();
   var frame = function() { //Code to execute every frame
-      if (boxDelay <= 125) {
+      if (boxDelay <= 400) {
         boxDelay++;
       }
-      if (boxDelay == 124) {
+      if (boxDelay == 399) {
         box.x = Math.floor(Math.random() * 12);
       }
       //boxDelay = -2;
@@ -31,7 +32,7 @@ function startGame() {
         } else {
           moveBoxman();
         }
-        if (boxDelay > 125) {
+        if (boxDelay > 400) {
           if (field.bonus < 15) {
             box.vel += .15;
           } else {
@@ -161,7 +162,7 @@ function checkBoxCollide() {
   if (box.y > document.getElementById("game").height - (field.heights[box.x] * 16) - 32) {
     box.y = document.getElementById("game").height - (field.heights[box.x] * 16) - 32;
     checkIfDead();
-    score += field.heights[boxman.x] + field.bonus;
+    score += 1 + Math.floor((field.heights[boxman.x] + field.bonus)/10);
     drawSprite((box.x + 1) * 16, box.y - box.vel, sprites.eraser);
     drawSprite((box.x + 1) * 16, box.y - 16, sprites.eraser);
     box.vel = 0;
@@ -499,6 +500,8 @@ function checkHighScores() {
     }
   }
   if (i != 5) {
+  	highScoreJingle.loop = true;
+    highScoreJingle.play();
     highscores.splice(i, 0, score);
     highnames.splice(i, 0, "new");
     highscores.splice(5, 1);
@@ -545,6 +548,8 @@ function checkHighScores() {
       if (enterLetter > 2 && enterLetter != 10) {
         enterLetter = 10;
         var pauser = 0;
+        highScoreJingle.pause();
+        highScoreJingle.currentTime = 0;
         var pause = setInterval(function() {
           pauser++;
           if (pauser > 200) {
@@ -784,4 +789,6 @@ var pickUp = new Audio('https://paskach.github.io/Boxman/Randomize248.wav');
 var jumpSound = new Audio('https://paskach.github.io/Boxman/Jump.wav');
 var warningSound = new Audio('https://paskach.github.io/Boxman/Warning.wav');
 var introSound = new Audio('https://paskach.github.io/Boxman/Intro.wav');
+var introJingle = new Audio('https://paskach.github.io/Boxman/Introjingle.wav');
+var highScoreJingle = new Audio('https://paskach.github.io/Boxman/Highscoreloop.wav');
 var alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '!', '', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
