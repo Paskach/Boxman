@@ -33,10 +33,10 @@ function startGame() {
           moveBoxman();
         }
         if (boxDelay > 400) {
-          if (field.bonus < 15) {
+          if (field.bonus < 30) {
             box.vel += .15;
           } else {
-            box.vel += field.bonus / 100;
+            box.vel += field.bonus / 200;
           }
           box.y += Math.floor(box.vel);
           checkBoxCollide();
