@@ -162,7 +162,7 @@ function checkBoxCollide() {
   if (box.y > document.getElementById("game").height - (field.heights[box.x] * 16) - 32) {
     box.y = document.getElementById("game").height - (field.heights[box.x] * 16) - 32;
     checkIfDead();
-    score += 1 + Math.floor((field.heights[boxman.x] + field.bonus)/10);
+    score += 2 + (2 * Math.floor((field.heights[boxman.x] + field.bonus)/5));
     drawSprite((box.x + 1) * 16, box.y - box.vel, sprites.eraser);
     drawSprite((box.x + 1) * 16, box.y - 16, sprites.eraser);
     box.vel = 0;
